@@ -9,13 +9,13 @@ class FaceDetection {
 
     public $bounds;
     public $found = false;
+    public $driver;
 
-    private $driver;
     private $image;
     private $padding_width = 0;
     private $padding_height = 0;
+    private $detection_data;
 
-    protected $detection_data;
 
     public function __construct() {
 
@@ -57,9 +57,7 @@ class FaceDetection {
 
         if ($ratio != 0) {
             $reduced_image = $this->driver->make($file);
-            $reduced_image->fit(intval($im_width / $ratio), intval($im_height / $ratio), null, 'top-left');
-            $this->image->save('tests/Data/tmp/original.jpg');
-            $reduced_image->save('tests/Data/tmp/reduced_image.jpg');
+            $reduced_image->fit(intval($im_width / $ratio), intval($im_height / $ratio));
 
             $stats = $this->get_img_stats($reduced_image);
             $this->bounds = $this->do_detect_greedy_big_to_small($stats['ii'], $stats['ii2'], $stats['width'], $stats['height']);
@@ -70,14 +68,20 @@ class FaceDetection {
                 $this->bounds['w'] *= $ratio;
                 $this->bounds['h'] *= $ratio;
             }
-            var_dump($this->bounds);
         } else {
             $stats = $this->get_img_stats($this->image);
             $this->bounds = $this->do_detect_greedy_big_to_small($stats['ii'], $stats['ii2'], $stats['width'], $stats['height']);
         }
+        
         if($this->bounds['w']>0){
             $this->found = true;
         }
+
+        $this->bounds['x'] = round($this->bounds['x'], 1);
+        $this->bounds['y'] = round($this->bounds['y'], 1);
+        $this->bounds['w'] = round($this->bounds['w'], 1);
+        $this->bounds['h'] = round($this->bounds['h'], 1);
+
         return $this;
     }
 
@@ -94,10 +98,8 @@ class FaceDetection {
             'height' => $this->bounds['w']+$this->padding_height,
         ];
 
-        var_dump($to_crop);
-
         $cropped_image = $this->driver->make($this->image);
-        $cropped_image->crop(intval($to_crop['width']), intval($to_crop['height']), 0, 0);
+        $cropped_image->crop(intval($to_crop['width']), intval($to_crop['height']), intval($to_crop['x']), intval($to_crop['y']));
         $cropped_image->save($file_name, 100, 'jpg');
     }
 
@@ -113,9 +115,9 @@ class FaceDetection {
     }
 
     protected function get_img_stats($image){
-        $image_width = $this->image->width();
-        $image_height = $this->image->height();
-        $iis =  $this->compute_ii($this->image, $image_width, $image_height);
+        $image_width = $image->width();
+        $image_height = $image->height();
+        $iis =  $this->compute_ii($image, $image_width, $image_height);
         return array(
             'width' => $image_width,
             'height' => $image_height,
@@ -141,7 +143,7 @@ class FaceDetection {
             $rowsum = 0;
             $rowsum2 = 0;
             for($j=1; $j<$ii_w-1; $j++ ){
-                $rgb = $this->image->pickColor($j, $i, 'int');
+                $rgb = $image->pickColor($j, $i, 'int');
                 $red = ($rgb >> 16) & 0xFF;
                 $green = ($rgb >> 8) & 0xFF;
                 $blue = $rgb & 0xFF;
