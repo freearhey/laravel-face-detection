@@ -16,6 +16,7 @@ class FaceDetectionTest extends TestCase
   {
     $this->normalFilePath = 'tests/Data/lena512color.jpg';
     $this->largeFilePath = 'tests/Data/lena1024color.jpg';
+    $this->emptyFilePath = 'tests/Data/empty.png';
     $this->tmpFilePath = 'tests/Data/face.jpg';
   }
 
@@ -40,6 +41,17 @@ class FaceDetectionTest extends TestCase
       'w' => 204.8,
       'h' => 204.8,
     ], $face->bounds);
+  }
+
+  public function testEmptyImage() 
+  {
+    $detector = new FaceDetection();
+
+    $face = $detector->extract($this->emptyFilePath);
+
+    $this->assertEquals(false, $face->found);
+
+    $this->assertEquals(null, $face->bounds);
   }
 
   public function testDetectFaceInLargeImage() 
