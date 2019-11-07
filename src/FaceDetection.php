@@ -61,26 +61,30 @@ class FaceDetection {
 
             $stats = $this->get_img_stats($reduced_image);
             $this->bounds = $this->do_detect_greedy_big_to_small($stats['ii'], $stats['ii2'], $stats['width'], $stats['height']);
-            $this->bounds['h'] = $this->bounds['w'];
-            if ($this->bounds['w'] > 0) {
-                $this->bounds['x'] *= $ratio;
-                $this->bounds['y'] *= $ratio;
-                $this->bounds['w'] *= $ratio;
-                $this->bounds['h'] *= $ratio;
+            if($this->bounds) {
+                $this->bounds['h'] = $this->bounds['w'];
+                if ($this->bounds['w'] > 0) {
+                    $this->bounds['x'] *= $ratio;
+                    $this->bounds['y'] *= $ratio;
+                    $this->bounds['w'] *= $ratio;
+                    $this->bounds['h'] *= $ratio;
+                }
             }
         } else {
             $stats = $this->get_img_stats($this->image);
             $this->bounds = $this->do_detect_greedy_big_to_small($stats['ii'], $stats['ii2'], $stats['width'], $stats['height']);
         }
         
-        if($this->bounds['w']>0){
-            $this->found = true;
-        }
+        if($this->bounds) {
+            if($this->bounds['w'] > 0) {
+                $this->found = true;
+            }
 
-        $this->bounds['x'] = round($this->bounds['x'], 1);
-        $this->bounds['y'] = round($this->bounds['y'], 1);
-        $this->bounds['w'] = round($this->bounds['w'], 1);
-        $this->bounds['h'] = round($this->bounds['h'], 1);
+            $this->bounds['x'] = round($this->bounds['x'], 1);
+            $this->bounds['y'] = round($this->bounds['y'], 1);
+            $this->bounds['w'] = round($this->bounds['w'], 1);
+            $this->bounds['h'] = round($this->bounds['h'], 1);
+        }
 
         return $this;
     }
