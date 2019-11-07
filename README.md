@@ -1,4 +1,4 @@
-# Face Detection
+# Face Detection [![Build Status](https://travis-ci.org/freearhey/laravel-face-detection.svg?branch=master)](https://travis-ci.org/freearhey/laravel-face-detection)
 
 A Laravel Package for Face Detection.
 
