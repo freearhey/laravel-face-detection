@@ -56,10 +56,10 @@ class FaceDetection {
         }
 
         if ($ratio != 0) {
-            $reduced_image = $this->driver->make($file);
-            $reduced_image->fit(intval($im_width / $ratio), intval($im_height / $ratio));
+            $this->image->backup();
+            $this->image->fit(intval($im_width / $ratio), intval($im_height / $ratio));
 
-            $stats = $this->get_img_stats($reduced_image);
+            $stats = $this->get_img_stats($this->image);
             $this->bounds = $this->do_detect_greedy_big_to_small($stats['ii'], $stats['ii2'], $stats['width'], $stats['height']);
             if($this->bounds) {
                 $this->bounds['h'] = $this->bounds['w'];
@@ -70,6 +70,7 @@ class FaceDetection {
                     $this->bounds['h'] *= $ratio;
                 }
             }
+            $this->image->reset();
         } else {
             $stats = $this->get_img_stats($this->image);
             $this->bounds = $this->do_detect_greedy_big_to_small($stats['ii'], $stats['ii2'], $stats['width'], $stats['height']);
