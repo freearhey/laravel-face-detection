@@ -14,9 +14,9 @@ class FaceDetectionTest extends TestCase
 
   public function setUp(): void
   {
-    $this->normalFilePath = dirname(__FILE__).'/../Data/lena512color.jpg';
-    $this->largeFilePath = dirname(__FILE__).'/../Data/lena1024color.jpg';
-    $this->tmpFilePath = dirname(__FILE__).'/../Data/tmp/face.jpg';
+    $this->normalFilePath = 'tests/Data/lena512color.jpg';
+    $this->largeFilePath = 'tests/Data/lena1024color.jpg';
+    $this->tmpFilePath = 'tests/Data/face.jpg';
   }
 
   public function tearDown(): void
