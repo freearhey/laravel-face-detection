@@ -2,22 +2,28 @@
 
 namespace Arhey\FaceDetection;
 
+use Intervention\Image\Image;
+use Intervention\Image\ImageManager;
+
 class FaceDetection {
 
-    protected $detection_data;
-    public $canvas;
-    public $face;
+    public $bounds;
     public $found = false;
-    private $reduced_canvas;
-    public $cropped_canvas;
+
+    private $driver;
+    private $image;
     private $padding_width = 0;
     private $padding_height = 0;
 
+    protected $detection_data;
+
     public function __construct() {
+
+        $this->driver = $this->defaultDriver();
 
         if(function_exists('config')) {
             $this->padding_width = config('facedetection.padding_width');
-            $this->padding_height = config('facedetection.padding_height');
+            $this->padding_height = config('facedetection.padding_height');    
         }
 
         $detection_file = 'src/Data/face.dat';
@@ -34,24 +40,10 @@ class FaceDetection {
 
     public function extract($file) {
 
-        if (is_resource($file)) {
-            $this->canvas = $file;
-        }
-        elseif (is_file($file)) {
-            $array = explode('.', $file);
-            $extencion = strtolower(end($array));
-            if($extencion == 'png'){
-                $this->canvas = imagecreatefrompng($file);
-            }else{
-            $this->canvas = imagecreatefromjpeg($file);
-            }
-        }
-        else {
-            throw new \Exception("Can not load $file");
-        }
+        $this->image = $this->driver->make($file);
 
-        $im_width = imagesx($this->canvas);
-        $im_height = imagesy($this->canvas);
+        $im_width = $this->image->width();
+        $im_height = $this->image->height();
 
         //Resample before detection?
         $ratio = 0;
@@ -64,10 +56,12 @@ class FaceDetection {
         }
 
         if ($ratio != 0) {
-            $this->reduced_canvas = imagecreatetruecolor($im_width / $ratio, $im_height / $ratio);
-            imagecopyresampled($this->reduced_canvas, $this->canvas, 0, 0, 0, 0, $im_width / $ratio, $im_height / $ratio, $im_width, $im_height);
+            $reduced_image = $this->driver->make($file);
+            $reduced_image->fit(intval($im_width / $ratio), intval($im_height / $ratio), null, 'top-left');
+            $this->image->save('tests/Data/tmp/original.jpg');
+            $reduced_image->save('tests/Data/tmp/reduced_image.jpg');
 
-            $stats = $this->get_img_stats($this->reduced_canvas);
+            $stats = $this->get_img_stats($reduced_image);
             $this->bounds = $this->do_detect_greedy_big_to_small($stats['ii'], $stats['ii2'], $stats['width'], $stats['height']);
             $this->bounds['h'] = $this->bounds['w'];
             if ($this->bounds['w'] > 0) {
@@ -76,8 +70,9 @@ class FaceDetection {
                 $this->bounds['w'] *= $ratio;
                 $this->bounds['h'] *= $ratio;
             }
+            var_dump($this->bounds);
         } else {
-            $stats = $this->get_img_stats($this->canvas);
+            $stats = $this->get_img_stats($this->image);
             $this->bounds = $this->do_detect_greedy_big_to_small($stats['ii'], $stats['ii2'], $stats['width'], $stats['height']);
         }
         if($this->bounds['w']>0){
@@ -91,6 +86,7 @@ class FaceDetection {
         if(file_exists($file_name)){
             throw new \Exception("Save File Already Exists ($file_name)");
         }
+        
         $to_crop = [
             'x' => $this->bounds['x']-($this->padding_width/2),
             'y' => $this->bounds['y']-($this->padding_height/2),
@@ -98,15 +94,28 @@ class FaceDetection {
             'height' => $this->bounds['w']+$this->padding_height,
         ];
 
-        $this->cropped_canvas = imagecrop($this->canvas, $to_crop);
+        var_dump($to_crop);
 
-        imagejpeg($this->cropped_canvas, $file_name, 100);
+        $cropped_image = $this->driver->make($this->image);
+        $cropped_image->crop(intval($to_crop['width']), intval($to_crop['height']), 0, 0);
+        $cropped_image->save($file_name, 100, 'jpg');
     }
 
-    protected function get_img_stats($canvas){
-        $image_width = imagesx($canvas);
-        $image_height = imagesy($canvas);
-        $iis =  $this->compute_ii($canvas, $image_width, $image_height);
+    protected function defaultDriver()
+    {
+        $driver = 'gd';
+
+        if(function_exists('config')) {
+            $driver = config('facedetection.driver');
+        }
+
+        return new ImageManager(['driver' => $driver]);
+    }
+
+    protected function get_img_stats($image){
+        $image_width = $this->image->width();
+        $image_height = $this->image->height();
+        $iis =  $this->compute_ii($this->image, $image_width, $image_height);
         return array(
             'width' => $image_width,
             'height' => $image_height,
@@ -115,7 +124,7 @@ class FaceDetection {
         );
     }
 
-    protected function compute_ii($canvas, $image_width, $image_height ){
+    protected function compute_ii($image, $image_width, $image_height ){
         $ii_w = $image_width+1;
         $ii_h = $image_height+1;
         $ii = array();
@@ -132,7 +141,7 @@ class FaceDetection {
             $rowsum = 0;
             $rowsum2 = 0;
             for($j=1; $j<$ii_w-1; $j++ ){
-                $rgb = ImageColorAt($canvas, $j, $i);
+                $rgb = $this->image->pickColor($j, $i, 'int');
                 $red = ($rgb >> 16) & 0xFF;
                 $green = ($rgb >> 8) & 0xFF;
                 $blue = $rgb & 0xFF;
@@ -236,7 +245,4 @@ class FaceDetection {
         }
         return true;
     }
-
-
-
 }

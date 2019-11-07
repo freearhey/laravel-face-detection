@@ -15,13 +15,17 @@ class FaceDetectionTest extends TestCase
   {
     $this->testFilePath = 'tests/Data/lena512color.jpg';
     $this->tmpFilePath = 'tests/Data/tmp/face.jpg';
+
+    if(file_exists($this->tmpFilePath)) {
+      unlink($this->tmpFilePath);
+    }
   }
 
   public function tearDown(): void
   {
-    if(file_exists($this->tmpFilePath)) {
-      unlink($this->tmpFilePath);
-    }
+    // if(file_exists($this->tmpFilePath)) {
+    //   unlink($this->tmpFilePath);
+    // }
   }
 
   public function testDetectFace() 
