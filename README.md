@@ -15,7 +15,7 @@ composer require freearhey/laravel-face-detection
 ```php
 'providers' => [
   ...
-  'Arhey\FaceDetection\FaceDetectionServiceProvider', 
+  Arhey\FaceDetection\FaceDetectionServiceProvider::class,
   ...
 ],
 ```
@@ -25,7 +25,7 @@ composer require freearhey/laravel-face-detection
 ```php
 'aliases' => [
   ...
-  'FaceDetection' => 'Arhey\FaceDetection\Facades\FaceDetection', 
+  'FaceDetection' => Arhey\FaceDetection\Facades\FaceDetection::class,
   ...
 ],
 ```
