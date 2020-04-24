@@ -1,7 +1,7 @@
 {
     "name": "freearhey/laravel-face-detection",
     "description": "A Laravel Package for Face Detection and Cropping in Images.",
-    "version": "1.0.5",
+    "version": "1.1.0",
     "license": "MIT",
     "keywords": [
         "Laravel",
@@ -14,9 +14,9 @@
     ],
     "require": {
         "php": "^7.0",
-        "illuminate/support": "~5.0|~6.0",
+        "illuminate/support": "^7.0",
         "intervention/image": "^2.5",
-        "phpunit/phpunit": "^7.0"
+        "phpunit/phpunit": "^8.5"
     },
     "autoload": {
         "psr-4": {
@@ -25,7 +25,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-           "Arhey\\FaceDetection\\Tests\\": "tests"
+            "Arhey\\FaceDetection\\Tests\\": "tests"
         }
     },
     "minimum-stability": "stable"
