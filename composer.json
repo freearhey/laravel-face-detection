@@ -13,7 +13,7 @@
     }
   ],
   "require": {
-    "php": "^7.0",
+    "php": "^7.3",
     "illuminate/support": "^8.0",
     "intervention/image": "^2.5"
   },
