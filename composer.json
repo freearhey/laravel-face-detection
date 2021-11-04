@@ -1,7 +1,6 @@
 {
   "name": "freearhey/laravel-face-detection",
   "description": "A Laravel Package for Face Detection and Cropping in Images.",
-  "version": "1.3.0",
   "license": "MIT",
   "keywords": [
     "Laravel",
