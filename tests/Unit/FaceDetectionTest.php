@@ -9,7 +9,8 @@ use Intervention\Image\ImageManager;
 class FaceDetectionTest extends TestCase 
 {
   private $normalFilePath;
-  
+  private $largeFilePath;
+  private $emptyFilePath;  
   private $tmpFilePath;
 
   public function setUp(): void
