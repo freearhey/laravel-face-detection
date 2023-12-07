@@ -156,7 +156,7 @@ class FaceDetection
         $red = ($rgb >> 16) & 0xFF;
         $green = ($rgb >> 8) & 0xFF;
         $blue = $rgb & 0xFF;
-        $grey = (0.2989 * $red + 0.587 * $green + 0.114 * $blue) >> 0; // this is what matlab uses
+        $grey = floor(0.2989 * $red + 0.587 * $green + 0.114 * $blue); // this is what matlab uses
         $rowsum += $grey;
         $rowsum2 += $grey * $grey;
 
@@ -177,10 +177,10 @@ class FaceDetection
     $start_scale = $s_h < $s_w ? $s_h : $s_w;
     $scale_update = 1 / 1.2;
     for ($scale = $start_scale; $scale > 1; $scale *= $scale_update) {
-      $w = (20 * $scale) >> 0;
+      $w = floor(20 * $scale);
       $endx = $width - $w - 1;
       $endy = $height - $w - 1;
-      $step = max($scale, 2) >> 0;
+      $step = floor(max($scale, 2));
       $inv_area = 1 / ($w * $w);
       for ($y = 0; $y < $endy; $y += $step) {
         for ($x = 0; $x < $endx; $x += $step) {
@@ -225,10 +225,10 @@ class FaceDetection
           for ($i_rect = 0; $i_rect < count($rects); $i_rect++) {
             $s = $scale;
             $rect = $rects[$i_rect];
-            $rx = ($rect[0] * $s + $x) >> 0;
-            $ry = ($rect[1] * $s + $y) >> 0;
-            $rw = ($rect[2] * $s) >> 0;
-            $rh = ($rect[3] * $s) >> 0;
+            $rx = floor($rect[0] * $s + $x);
+            $ry = floor($rect[1] * $s + $y);
+            $rw = floor($rect[2] * $s);
+            $rh = floor($rect[3] * $s);
             $wt = $rect[4];
 
             $r_sum = ($ii[($ry + $rh) * $iiw + $rx + $rw] + $ii[$ry * $iiw + $rx] - $ii[($ry + $rh) * $iiw + $rx] - $ii[$ry * $iiw + $rx + $rw]) * $wt;
