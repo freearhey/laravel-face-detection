@@ -20,17 +20,7 @@ composer require freearhey/laravel-face-detection
 ],
 ```
 
-3. Add an alias for the Facade to the `config/app.php` file in Laravel:
-
-```php
-'aliases' => [
-  ...
-  'FaceDetection' => Arhey\FaceDetection\Facades\FaceDetection::class,
-  ...
-],
-```
-
-4. Publish the config file by running:
+3. Publish the config file by running:
 
 ```sh
 php artisan vendor:publish
@@ -39,7 +29,7 @@ php artisan vendor:publish
 ## Usage
 
 ```php
-use FaceDetection;
+use Arhey\FaceDetection\Facades\FaceDetection;
 
 $face = FaceDetection::extract('path/to/image.jpg');
 ```
